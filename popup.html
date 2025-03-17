@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button id="generatorTab" class="tab-btn active">Generator</button>
+            <button id="bookmarksTab" class="tab-btn">Bookmarks</button>
+        </div>
+        
+        <div id="generatorPanel" class="panel">
+            <h2>Select Citation Type</h2>
+            <div class="styles">
+                <button class="citation-btn" data-type="book"><img src="icons/book.png" alt="Book"> Book</button>
+                <button class="citation-btn" data-type="chapter"><img src="icons/chapter.png" alt="Chapter"> Chapter</button>
+                <button class="citation-btn" data-type="thesis"><img src="icons/thesis.png" alt="Thesis"> Thesis</button>
+                <button class="citation-btn" data-type="journal"><img src="icons/journal.png" alt="Journal"> Journal</button>
+                <button class="citation-btn" data-type="webpage"><img src="icons/webpage.png" alt="Webpage"> Webpage</button>
+            </div>
+            
+            <form id="citationForm">
+                <div id="formFields"></div>
+                <button type="button" id="generateCitation">Generate Citation</button>
+            </form>
+            
+            <div class="citation-output-container">
+                <textarea id="citationOutput" readonly></textarea>
+                <div class="button-row">
+                    <button id="copyButton">Copy</button>
+                    <button id="bookmarkButton">Bookmark</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="bookmarksPanel" class="panel hidden">
+            <h2>Bookmarked Citations</h2>
+            <div id="bookmarksList" class="bookmarks-list">
+                <!-- Bookmarks will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="bookmarkModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Add Bookmark</h3>
+            <input type="text" id="bookmarkTitle" placeholder="Enter a title for this citation">
+            <div class="button-row">
+                <button id="cancelBookmark">Cancel</button>
+                <button id="saveBookmark">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="bookmarks.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
