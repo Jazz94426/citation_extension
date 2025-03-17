@@ -97,15 +97,16 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelectorAll(".citation-btn").forEach(btn => btn.classList.remove("active"));
             button.classList.add("active");
             const type = button.getAttribute("data-type");
-            
 
+            // Ensure thesis type selector visibility is toggled only for "thesis"
             const thesisTypeSelector = document.getElementById("thesisTypeSelector");
             if (type === "thesis") {
                 thesisTypeSelector.classList.remove("hidden");
             } else {
                 thesisTypeSelector.classList.add("hidden");
             }
-            
+
+            // Render form fields for the selected citation type
             renderFormFields(type);
         });
     });
@@ -135,12 +136,59 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderFormFields(type) {
         formFields.innerHTML = "";
         citationTemplates[type].forEach(field => {
-            const input = document.createElement("input");
-            input.type = "text";
-            input.id = field.id;
-            input.placeholder = field.label;
-            formFields.appendChild(input);
+            if (["authorLast", "authorFirst", "chapterAuthorLast", "chapterAuthorFirst", "editorLast", "editorFirst"].includes(field.id)) {
+                const nameContainer = document.createElement("div");
+                nameContainer.className = "name-controls";
+
+                const createNameInput = () => {
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.placeholder = field.label;
+                    input.className = "name-input";
+                    return input;
+                };
+
+                const input = createNameInput();
+
+                const addButton = document.createElement("button");
+                addButton.type = "button";
+                addButton.textContent = "+";
+                addButton.addEventListener("click", () => {
+                    const newInput = createNameInput();
+                    nameContainer.insertBefore(newInput, addButton);
+                });
+
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.textContent = "-";
+                removeButton.addEventListener("click", () => {
+                    const inputs = nameContainer.querySelectorAll("input");
+                    if (inputs.length > 1) {
+                        nameContainer.removeChild(inputs[inputs.length - 1]);
+                    }
+                });
+
+                nameContainer.appendChild(input);
+                nameContainer.appendChild(addButton);
+                nameContainer.appendChild(removeButton);
+                formFields.appendChild(nameContainer);
+            } else {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.id = field.id;
+                input.placeholder = field.label;
+                formFields.appendChild(input);
+            }
         });
+
+        if (type === "thesis") {
+            const thesisTypeSelector = document.getElementById("thesisTypeSelector");
+            formFields.appendChild(thesisTypeSelector);
+            thesisTypeSelector.classList.remove("hidden");
+        } else {
+            const thesisTypeSelector = document.getElementById("thesisTypeSelector");
+            thesisTypeSelector.classList.add("hidden");
+        }
     }
 
     generateButton.addEventListener("click", () => {
