@@ -362,3 +362,9 @@ input[type="text"] {
 .university-input.hidden {
     display: none;
 }
+
+hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 15px 0;
+}

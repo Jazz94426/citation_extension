@@ -70,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "year", label: "Year" },
             { id: "title", label: "Title" },
             { id: "reference", label: "Reference Number" },
+            { id: "university", label: "University" }
         ],
         journal: [
             { id: "authorLast", label: "Author Last Name" },
@@ -140,15 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
             input.placeholder = field.label;
             formFields.appendChild(input);
         });
-
-        if (type === "thesis") {
-            const universityInput = document.createElement("input");
-            universityInput.type = "text";
-            universityInput.id = "university";
-            universityInput.placeholder = "University";
-            universityInput.className = selectedThesisType === "other" ? "hidden" : "";
-            formFields.appendChild(universityInput);
-        }
     }
 
     generateButton.addEventListener("click", () => {
