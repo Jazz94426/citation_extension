@@ -113,28 +113,48 @@ document.addEventListener("DOMContentLoaded", () => {
             values[field.id] = document.getElementById(field.id)?.value || "";
         });
 
-        citationOutput.value = formatCitation(selectedType, values);
+        citationOutput.innerHTML = formatCitation(selectedType, values);
     });
 
     function formatCitation(type, values) {
+        // Define formats with italic formatting using <i></i> tags
         const formats = {
-            book: `${values.authorLast}, ${values.authorFirst}. (${values.year}). ${values.title} (${values.edition}). ${values.publisher}.`,
-            chapter: `${values.chapterAuthorLast}, ${values.chapterAuthorFirst}. (${values.year}). ${values.chapterTitle}. In ${values.editorLast}, ${values.editorFirst} (ed.), ${values.bookTitle} (${values.edition}) (pp.: ${values.pages}). ${values.publisher}.`,
-            thesis: `${values.authorLast}, ${values.authorFirst}. (${values.year}). ${values.title}. (${values.reference}) [Doctoral thesis, ${values.university}].`,
-            journal: `${values.authorLast}, ${values.authorFirst}. (${values.year}). ${values.title}. ${values.journalTitle}, ${values.volume}(${values.issue}), ${values.pages}.`,
-            webpage: `${values.website}. ${values.title}. ${values.url}. (Accessed on ${values.accessDate}).`
+            book: `${values.authorLast}, ${values.authorFirst}. (${values.year}). <i>${values.title} (${values.edition})</i>. ${values.publisher}.`,
+            chapter: `${values.chapterAuthorLast}, ${values.chapterAuthorFirst}. (${values.year}). ${values.chapterTitle}. In ${values.editorLast}, ${values.editorFirst} (ed.), <i>${values.bookTitle} (${values.edition})</i> (pp.: ${values.pages}). ${values.publisher}.`,
+            thesis: `${values.authorLast}, ${values.authorFirst}. (${values.year}). <i>${values.title}</i>. (${values.reference}) [Doctoral thesis, ${values.university}].`,
+            journal: `${values.authorLast}, ${values.authorFirst}. (${values.year}). ${values.title}. <i>${values.journalTitle}</i>, ${values.volume}(${values.issue}), ${values.pages}.`,
+            webpage: `${values.website}. <i>${values.title}</i>. ${values.url}. (Accessed on ${values.accessDate}).`
         };
         return formats[type] || "";
     }
 
     copyButton.addEventListener("click", () => {
-        citationOutput.select();
-        document.execCommand("copy");
+        // For copy, we need to handle the HTML format
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = citationOutput.innerHTML;
+        
+        // Create a temporary textarea for the plain text version
+        const tempTextarea = document.createElement('textarea');
+        
+        // Create text with italics represented as appropriate in plain text
+        const textContent = tempDiv.innerText;
+        tempTextarea.value = textContent;
+        
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextarea);
+        
+        // Visual feedback
+        copyButton.textContent = "Copied!";
+        setTimeout(() => {
+            copyButton.textContent = "Copy";
+        }, 1500);
     });
     
     // Bookmark button functionality
     bookmarkButton.addEventListener("click", () => {
-        if (citationOutput.value.trim() === "") return;
+        if (citationOutput.innerHTML.trim() === "") return;
         
         // Show the bookmark modal
         bookmarkModal.classList.remove("hidden");
@@ -165,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
     saveBookmarkBtn.addEventListener("click", () => {
         const selectedType = document.querySelector(".citation-btn.active")?.getAttribute("data-type");
         const title = bookmarkTitle.value.trim();
-        const citation = citationOutput.value;
+        const citation = citationOutput.innerHTML;
         
         if (citation.trim() === "") return;
         
@@ -211,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const citation = document.createElement("p");
             citation.className = "bookmark-citation";
-            citation.textContent = bookmark.citation;
+            citation.innerHTML = bookmark.citation; // Use innerHTML to preserve italic formatting
             
             const controls = document.createElement("div");
             controls.className = "bookmark-controls";
@@ -222,9 +242,13 @@ document.addEventListener("DOMContentLoaded", () => {
             copyBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 
-                // Create a temporary textarea to copy the citation
+                // Create a temporary div to handle HTML content
+                const tempDiv = document.createElement("div");
+                tempDiv.innerHTML = bookmark.citation;
+                
+                // Create a temporary textarea for the plain text version
                 const tempTextarea = document.createElement("textarea");
-                tempTextarea.value = bookmark.citation;
+                tempTextarea.value = tempDiv.innerText;
                 document.body.appendChild(tempTextarea);
                 tempTextarea.select();
                 document.execCommand("copy");

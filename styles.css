@@ -128,6 +128,19 @@ input[type="text"] {
     margin-bottom: 10px;
     font-size: 14px;
     resize: none;
+    overflow-y: auto;
+    background-color: white;
+    line-height: 1.5;
+}
+
+/* Added for italic formatting */
+#citationOutput i {
+    font-style: italic;
+}
+
+.citation-text-area {
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .button-row {
@@ -192,6 +205,11 @@ input[type="text"] {
     line-height: 1.4;
     margin-bottom: 5px;
     word-break: break-word;
+}
+
+/* Added for italic formatting in bookmarks */
+.bookmark-citation i {
+    font-style: italic;
 }
 
 .bookmark-controls {
