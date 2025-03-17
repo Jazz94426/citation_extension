@@ -3,7 +3,7 @@
   "name": "Citation Generator",
   "version": "1.0",
   "description": "Generate citations from websites in multiple formats.",
-  "permissions": ["activeTab", "clipboardWrite", "storage"],
+  "permissions": ["activeTab", "clipboardWrite", "storage", "tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

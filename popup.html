@@ -23,6 +23,7 @@
                 <button class="citation-btn" data-type="webpage"><img src="icons/webpage.png" alt="Webpage"> Webpage</button>
             </div>
             
+            
             <form id="citationForm">
                 <div id="formFields"></div>
                 <button type="button" id="generateCitation">Generate Citation</button>
@@ -36,7 +37,12 @@
                 </div>
             </div>
         </div>
-        
+        <div id="thesisTypeSelector" class="thesis-type-selector hidden">
+            <button class="thesis-type-btn" data-type="doctoral">Doctoral</button>
+            <button class="thesis-type-btn" data-type="masters">Master</button>
+            <button class="thesis-type-btn" data-type="other">Other</button>
+            <input type="text" id="otherThesisType" class="hidden" placeholder="Enter thesis type">
+        </div>
         <div id="bookmarksPanel" class="panel hidden">
             <h2>Bookmarked Citations</h2>
             <div id="bookmarksList" class="bookmarks-list">
@@ -49,6 +55,15 @@
         <div class="modal-content">
             <h3>Add Bookmark</h3>
             <input type="text" id="bookmarkTitle" placeholder="Enter a title for this citation">
+            <div class="checkbox-row">
+                <label>
+                    <input type="checkbox" id="savePageUrl" checked>
+                    Include current page URL
+                </label>
+            </div>
+            <div id="urlInputContainer" class="url-input-container">
+                <input type="text" id="bookmarkUrl" placeholder="URL">
+            </div>
             <div class="button-row">
                 <button id="cancelBookmark">Cancel</button>
                 <button id="saveBookmark">Save</button>

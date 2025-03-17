@@ -5,23 +5,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const copyButton = document.getElementById("copyButton");
     const bookmarkButton = document.getElementById("bookmarkButton");
     const bookmarksList = document.getElementById("bookmarksList");
-    
-    // Tab navigation
+
     const generatorTab = document.getElementById("generatorTab");
     const bookmarksTab = document.getElementById("bookmarksTab");
     const generatorPanel = document.getElementById("generatorPanel");
     const bookmarksPanel = document.getElementById("bookmarksPanel");
     
-    // Modal elements
     const bookmarkModal = document.getElementById("bookmarkModal");
     const bookmarkTitle = document.getElementById("bookmarkTitle");
+    const savePageUrl = document.getElementById("savePageUrl");
     const saveBookmarkBtn = document.getElementById("saveBookmark");
     const cancelBookmarkBtn = document.getElementById("cancelBookmark");
+    const urlInputContainer = document.getElementById("urlInputContainer");
+    const bookmarkUrl = document.getElementById("bookmarkUrl");
     
-    // Initialize bookmark manager
+
+    let currentPageUrl = "";
+
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        currentPageUrl = tabs[0].url;
+    });
+    
     const bookmarkManager = new BookmarkManager();
     
-    // Tab switching
     generatorTab.addEventListener("click", () => {
         generatorTab.classList.add("active");
         bookmarksTab.classList.remove("active");
@@ -64,7 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "year", label: "Year" },
             { id: "title", label: "Title" },
             { id: "reference", label: "Reference Number" },
-            { id: "university", label: "University" }
         ],
         journal: [
             { id: "authorLast", label: "Author Last Name" },
@@ -84,12 +89,45 @@ document.addEventListener("DOMContentLoaded", () => {
         ]
     };
 
+    let selectedThesisType = "doctoral"; 
+
     document.querySelectorAll(".citation-btn").forEach(button => {
         button.addEventListener("click", () => {
             document.querySelectorAll(".citation-btn").forEach(btn => btn.classList.remove("active"));
             button.classList.add("active");
             const type = button.getAttribute("data-type");
+            
+
+            const thesisTypeSelector = document.getElementById("thesisTypeSelector");
+            if (type === "thesis") {
+                thesisTypeSelector.classList.remove("hidden");
+            } else {
+                thesisTypeSelector.classList.add("hidden");
+            }
+            
             renderFormFields(type);
+        });
+    });
+
+
+    document.querySelectorAll(".thesis-type-btn").forEach(button => {
+        button.addEventListener("click", () => {
+            document.querySelectorAll(".thesis-type-btn").forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+            
+            const type = button.getAttribute("data-type");
+            selectedThesisType = type;
+            
+            const otherInput = document.getElementById("otherThesisType");
+            const universityInput = document.getElementById("university");
+            
+            if (type === "other") {
+                otherInput.classList.remove("hidden");
+                if (universityInput) universityInput.classList.add("hidden");
+            } else {
+                otherInput.classList.add("hidden");
+                if (universityInput) universityInput.classList.remove("hidden");
+            }
         });
     });
 
@@ -102,6 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
             input.placeholder = field.label;
             formFields.appendChild(input);
         });
+
+        if (type === "thesis") {
+            const universityInput = document.createElement("input");
+            universityInput.type = "text";
+            universityInput.id = "university";
+            universityInput.placeholder = "University";
+            universityInput.className = selectedThesisType === "other" ? "hidden" : "";
+            formFields.appendChild(universityInput);
+        }
     }
 
     generateButton.addEventListener("click", () => {
@@ -117,26 +164,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     function formatCitation(type, values) {
-        // Define formats with italic formatting using <i></i> tags
         const formats = {
             book: `${values.authorLast}, ${values.authorFirst}. (${values.year}). <i>${values.title} (${values.edition})</i>. ${values.publisher}.`,
             chapter: `${values.chapterAuthorLast}, ${values.chapterAuthorFirst}. (${values.year}). ${values.chapterTitle}. In ${values.editorLast}, ${values.editorFirst} (ed.), <i>${values.bookTitle} (${values.edition})</i> (pp.: ${values.pages}). ${values.publisher}.`,
-            thesis: `${values.authorLast}, ${values.authorFirst}. (${values.year}). <i>${values.title}</i>. (${values.reference}) [Doctoral thesis, ${values.university}].`,
+            thesis: `${values.authorLast}, ${values.authorFirst}. (${values.year}). <i>${values.title}</i>. (${values.reference}) [${getThesisTypeText()}, ${values.university}].`,
             journal: `${values.authorLast}, ${values.authorFirst}. (${values.year}). ${values.title}. <i>${values.journalTitle}</i>, ${values.volume}(${values.issue}), ${values.pages}.`,
             webpage: `${values.website}. <i>${values.title}</i>. ${values.url}. (Accessed on ${values.accessDate}).`
         };
         return formats[type] || "";
     }
 
+    function getThesisTypeText() {
+        switch (selectedThesisType) {
+            case "doctoral":
+                return "Doctoral thesis";
+            case "masters":
+                return "Master's thesis";
+            case "other":
+                const otherInput = document.getElementById("otherThesisType");
+                return otherInput.value.trim() || "Thesis";
+            default:
+                return "Thesis";
+        }
+    }
+
     copyButton.addEventListener("click", () => {
-        // For copy, we need to handle the HTML format
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = citationOutput.innerHTML;
         
-        // Create a temporary textarea for the plain text version
         const tempTextarea = document.createElement('textarea');
         
-        // Create text with italics represented as appropriate in plain text
         const textContent = tempDiv.innerText;
         tempTextarea.value = textContent;
         
@@ -145,21 +202,28 @@ document.addEventListener("DOMContentLoaded", () => {
         document.execCommand('copy');
         document.body.removeChild(tempTextarea);
         
-        // Visual feedback
         copyButton.textContent = "Copied!";
         setTimeout(() => {
             copyButton.textContent = "Copy";
         }, 1500);
     });
     
-    // Bookmark button functionality
     bookmarkButton.addEventListener("click", () => {
         if (citationOutput.innerHTML.trim() === "") return;
         
-        // Show the bookmark modal
         bookmarkModal.classList.remove("hidden");
         
-        // Generate a default title
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            currentPageUrl = tabs[0].url;
+            bookmarkUrl.value = currentPageUrl;
+        });
+        
+        if (savePageUrl.checked) {
+            urlInputContainer.classList.add("visible");
+        } else {
+            urlInputContainer.classList.remove("visible");
+        }
+        
         const selectedType = document.querySelector(".citation-btn.active")?.getAttribute("data-type");
         let defaultTitle = "";
         
@@ -183,13 +247,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     
     saveBookmarkBtn.addEventListener("click", () => {
-        const selectedType = document.querySelector(".citation-btn.active")?.getAttribute("data-type");
-        const title = bookmarkTitle.value.trim();
         const citation = citationOutput.innerHTML;
+        const selectedType = document.querySelector(".citation-btn.active")?.getAttribute("data-type");
+        const title = bookmarkTitle.value.trim() || `Citation ${Date.now()}`;
+        const url = savePageUrl.checked ? bookmarkUrl.value : null;
         
-        if (citation.trim() === "") return;
+        bookmarkManager.addBookmark(citation, selectedType, title, url);
         
-        bookmarkManager.addBookmark(citation, selectedType, title);
+        bookmarkTitle.value = "";
+        bookmarkUrl.value = "";
         bookmarkModal.classList.add("hidden");
     });
     
@@ -197,7 +263,15 @@ document.addEventListener("DOMContentLoaded", () => {
         bookmarkModal.classList.add("hidden");
     });
     
-    // Load bookmarks into the bookmarks panel
+    savePageUrl.addEventListener("change", (e) => {
+        if (e.target.checked) {
+            urlInputContainer.classList.add("visible");
+            bookmarkUrl.value = currentPageUrl;
+        } else {
+            urlInputContainer.classList.remove("visible");
+        }
+    });
+    
     async function loadBookmarks() {
         await bookmarkManager.loadBookmarks();
         const bookmarks = bookmarkManager.getBookmarks();
@@ -231,7 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const citation = document.createElement("p");
             citation.className = "bookmark-citation";
-            citation.innerHTML = bookmark.citation; // Use innerHTML to preserve italic formatting
+            citation.innerHTML = bookmark.citation;
             
             const controls = document.createElement("div");
             controls.className = "bookmark-controls";
@@ -242,43 +316,43 @@ document.addEventListener("DOMContentLoaded", () => {
             copyBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 
-                // Create a temporary div to handle HTML content
                 const tempDiv = document.createElement("div");
                 tempDiv.innerHTML = bookmark.citation;
                 
-                // Create a temporary textarea for the plain text version
                 const tempTextarea = document.createElement("textarea");
                 tempTextarea.value = tempDiv.innerText;
                 document.body.appendChild(tempTextarea);
                 tempTextarea.select();
                 document.execCommand("copy");
                 document.body.removeChild(tempTextarea);
-                
-                // Visual feedback
+
+
                 copyBtn.textContent = "Copied!";
                 setTimeout(() => {
                     copyBtn.textContent = "Copy";
                 }, 1500);
             });
-            
+
             const deleteBtn = document.createElement("button");
             deleteBtn.className = "bookmark-delete-btn";
             deleteBtn.textContent = "Delete";
             deleteBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                
-                if (confirm("Are you sure you want to delete this bookmark?")) {
-                    bookmarkManager.removeBookmark(parseInt(bookmarkItem.dataset.id));
-                    bookmarkItem.remove();
-                    
-                    // If no bookmarks left, show the "no bookmarks" message
-                    if (bookmarkManager.getBookmarks().length === 0) {
-                        bookmarksList.innerHTML = "<p class='no-bookmarks'>No bookmarks yet. Create some citations and bookmark them!</p>";
-                    }
-                }
+                bookmarkManager.deleteBookmark(bookmark.id);
+                loadBookmarks();
             });
             
-            // Append all elements
+            if (bookmark.url) {
+                const visitBtn = document.createElement("button");
+                visitBtn.className = "bookmark-visit-btn";
+                visitBtn.textContent = "Visit";
+                visitBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    chrome.tabs.create({ url: bookmark.url });
+                });
+                controls.appendChild(visitBtn);
+            }
+            
             controls.appendChild(copyBtn);
             controls.appendChild(deleteBtn);
             
@@ -294,7 +368,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
     
-    // Initialize with the first citation type selected
     const firstCitationBtn = document.querySelector(".citation-btn");
     if (firstCitationBtn) {
         firstCitationBtn.classList.add("active");

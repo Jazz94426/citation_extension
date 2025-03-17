@@ -1,4 +1,3 @@
-/* General Styles */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -35,7 +34,7 @@ button:hover {
     background-color: #3367d6;
 }
 
-/* Tabs */
+
 .tabs {
     display: flex;
     border-bottom: 1px solid #ddd;
@@ -64,7 +63,7 @@ button:hover {
     display: none;
 }
 
-/* Citation Styles */
+
 .styles {
     display: flex;
     flex-wrap: wrap;
@@ -94,7 +93,7 @@ button:hover {
     color: #4285f4;
 }
 
-/* Form */
+
 #formFields {
     display: flex;
     flex-direction: column;
@@ -114,7 +113,7 @@ input[type="text"] {
     width: 100%;
 }
 
-/* Citation Output */
+
 .citation-output-container {
     margin-bottom: 15px;
 }
@@ -133,7 +132,7 @@ input[type="text"] {
     line-height: 1.5;
 }
 
-/* Added for italic formatting */
+
 #citationOutput i {
     font-style: italic;
 }
@@ -207,7 +206,7 @@ input[type="text"] {
     word-break: break-word;
 }
 
-/* Added for italic formatting in bookmarks */
+
 .bookmark-citation i {
     font-style: italic;
 }
@@ -218,20 +217,49 @@ input[type="text"] {
     gap: 5px;
 }
 
-.bookmark-copy-btn, .bookmark-delete-btn {
+.bookmark-copy-btn, .bookmark-visit-btn {
     padding: 5px 8px;
     font-size: 12px;
 }
 
+.bookmark-visit-btn {
+    background-color: #4caf50;
+}
+
+.bookmark-visit-btn:hover {
+    background-color: #388e3c;
+}
+
 .bookmark-delete-btn {
+    padding: 5px 8px;
+    font-size: 12px;
     background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 .bookmark-delete-btn:hover {
     background-color: #d32f2f;
 }
 
-/* Modal */
+.checkbox-row {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-row label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+}
+
+
 .modal {
     position: fixed;
     top: 0;
@@ -262,7 +290,7 @@ input[type="text"] {
     font-size: 16px;
 }
 
-.modal-content input {
+.modal-content input[type="text"] {
     width: 100%;
     margin-bottom: 15px;
 }
@@ -273,4 +301,64 @@ input[type="text"] {
 
 #cancelBookmark:hover {
     background-color: #757575;
+}
+
+.url-input-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.url-input-container.visible {
+    display: block;
+}
+
+#bookmarkUrl {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.thesis-type-selector {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.thesis-type-selector.hidden {
+    display: none;
+}
+
+.thesis-type-btn {
+    padding: 6px 12px;
+    background-color: #f1f1f1;
+    color: #555;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    flex: 1;
+}
+
+.thesis-type-btn.active {
+    background-color: #e6f2fe;
+    border-color: #4285f4;
+    color: #4285f4;
+}
+
+#otherThesisType {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#otherThesisType.hidden {
+    display: none;
+}
+
+.university-input.hidden {
+    display: none;
 }

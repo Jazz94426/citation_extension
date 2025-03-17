@@ -1,4 +1,3 @@
-// Extract metadata from the current page
 function extractMetadata() {
     return {
         title: document.title || "Unknown Title",
@@ -8,7 +7,6 @@ function extractMetadata() {
     };
 }
 
-// Listen for messages from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "getMetadata") {
         sendResponse(extractMetadata());
