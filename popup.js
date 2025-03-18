@@ -446,4 +446,58 @@ document.addEventListener("DOMContentLoaded", () => {
         firstCitationBtn.classList.add("active");
         renderFormFields(firstCitationBtn.getAttribute("data-type"));
     }
+
+    const connectApiKeyButton = document.getElementById("connectApiKeyButton");
+    const apiKeyModal = document.getElementById("apiKeyModal");
+    const apiKeyInput = document.getElementById("apiKeyInput");
+    const apiKeyStatus = document.getElementById("apiKeyStatus");
+    const cancelApiKey = document.getElementById("cancelApiKey");
+    const saveApiKey = document.getElementById("saveApiKey");
+
+    connectApiKeyButton.addEventListener("click", () => {
+        apiKeyModal.classList.remove("hidden");
+        chrome.storage.sync.get("openAiApiKey", (result) => {
+            apiKeyInput.value = result.openAiApiKey || "";
+            apiKeyStatus.textContent = "";
+        });
+    });
+
+    cancelApiKey.addEventListener("click", () => {
+        apiKeyModal.classList.add("hidden");
+    });
+
+    saveApiKey.addEventListener("click", () => {
+        const apiKey = apiKeyInput.value.trim();
+        if (!apiKey) {
+            apiKeyStatus.textContent = "API key cannot be empty.";
+            apiKeyStatus.style.color = "red";
+            return;
+        }
+
+        // Save the API key
+        chrome.storage.sync.set({ openAiApiKey: apiKey }, () => {
+            apiKeyStatus.textContent = "Validating API key...";
+            apiKeyStatus.style.color = "blue";
+
+            // Validate the API key
+            fetch("https://api.openai.com/v1/models", {
+                headers: {
+                    Authorization: `Bearer ${apiKey}`
+                }
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        apiKeyStatus.textContent = "API key is valid!";
+                        apiKeyStatus.style.color = "green";
+                    } else {
+                        apiKeyStatus.textContent = "Invalid API key. Please try again.";
+                        apiKeyStatus.style.color = "red";
+                    }
+                })
+                .catch(() => {
+                    apiKeyStatus.textContent = "Error validating API key. Please check your connection.";
+                    apiKeyStatus.style.color = "red";
+                });
+        });
+    });
 });
