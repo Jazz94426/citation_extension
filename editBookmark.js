@@ -78,7 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Save updated data
                 chrome.storage.sync.set({ citationBookmarks: bookmarks, bookmarkCategories: categories }, () => {
                     alert("Bookmark updated successfully.");
-                    window.close();
+                    // Redirect back to the bookmarks tab
+                    chrome.storage.sync.set({ editingBookmark: null }, () => {
+                        window.location.href = "popup.html";
+                        setTimeout(() => {
+                            document.getElementById("bookmarksTab").click();
+                        }, 100);
+                    });
                 });
             } else {
                 alert("Failed to find the bookmark to edit.");
@@ -88,7 +94,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Handle the "Cancel" button click
     cancelEditBookmark.addEventListener("click", () => {
-        window.close();
+        // Redirect back to the bookmarks tab
+        chrome.storage.sync.set({ editingBookmark: null }, () => {
+            window.location.href = "popup.html";
+            setTimeout(() => {
+                document.getElementById("bookmarksTab").click();
+            }, 100);
+        });
     });
 
     // Toggle the URL input container visibility
