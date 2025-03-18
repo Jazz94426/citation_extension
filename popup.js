@@ -406,97 +406,149 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadBookmarks() {
         await bookmarkManager.loadBookmarks();
         const bookmarks = bookmarkManager.getBookmarks();
-        
+        const categories = bookmarkManager.getCategories();
+    
         bookmarksList.innerHTML = "";
-        
+    
         if (bookmarks.length === 0) {
             bookmarksList.innerHTML = "<p class='no-bookmarks'>No bookmarks yet. Create some citations and bookmark them!</p>";
             return;
         }
-        
-        bookmarks.forEach(bookmark => {
-            const bookmarkItem = document.createElement("div");
-            bookmarkItem.className = "bookmark-item";
-            bookmarkItem.dataset.id = bookmark.id;
-            
-            const typeIcon = document.createElement("img");
-            typeIcon.src = `icons/${bookmark.type}.png`;
-            typeIcon.alt = bookmark.type;
-            typeIcon.className = "bookmark-type-icon";
-            
-            const content = document.createElement("div");
-            content.className = "bookmark-content";
-            
-            const title = document.createElement("h3");
-            title.textContent = bookmark.title;
-            
-            const date = document.createElement("span");
-            date.className = "bookmark-date";
-            date.textContent = bookmark.date;
-            
-            const citation = document.createElement("p");
-            citation.className = "bookmark-citation";
-            citation.innerHTML = bookmark.citation;
-            
-            const controls = document.createElement("div");
-            controls.className = "bookmark-controls";
-            
-            const copyBtn = document.createElement("button");
-            copyBtn.className = "bookmark-copy-btn";
-            copyBtn.textContent = "Copy";
-            copyBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                
-                const tempDiv = document.createElement("div");
-                tempDiv.innerHTML = bookmark.citation;
-                
-                const tempTextarea = document.createElement("textarea");
-                tempTextarea.value = tempDiv.innerText;
-                document.body.appendChild(tempTextarea);
-                tempTextarea.select();
-                document.execCommand("copy");
-                document.body.removeChild(tempTextarea);
-
-
-                copyBtn.textContent = "Copied!";
-                setTimeout(() => {
-                    copyBtn.textContent = "Copy";
-                }, 1500);
-            });
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.className = "bookmark-delete-btn";
-            deleteBtn.textContent = "Delete";
-            deleteBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                bookmarkManager.deleteBookmark(bookmark.id);
-                loadBookmarks();
-            });
-            
-            if (bookmark.url) {
-                const visitBtn = document.createElement("button");
-                visitBtn.className = "bookmark-visit-btn";
-                visitBtn.textContent = "Visit";
-                visitBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    chrome.tabs.create({ url: bookmark.url });
-                });
-                controls.appendChild(visitBtn);
-            }
-            
-            controls.appendChild(copyBtn);
-            controls.appendChild(deleteBtn);
-            
-            content.appendChild(title);
-            content.appendChild(date);
-            content.appendChild(citation);
-            
-            bookmarkItem.appendChild(typeIcon);
-            bookmarkItem.appendChild(content);
-            bookmarkItem.appendChild(controls);
-            
-            bookmarksList.appendChild(bookmarkItem);
+    
+        // Create a section for uncategorized bookmarks
+        const uncategorizedSection = document.createElement("div");
+        uncategorizedSection.className = "category-section";
+    
+        const uncategorizedHeader = document.createElement("div");
+        uncategorizedHeader.className = "category-header";
+        uncategorizedHeader.innerHTML = `<span>Uncategorized</span> <span class="arrow">▶</span>`;
+        uncategorizedSection.appendChild(uncategorizedHeader);
+    
+        const uncategorizedList = document.createElement("div");
+        uncategorizedList.className = "bookmark-list hidden";
+        bookmarks
+            .filter(bookmark => !bookmark.category)
+            .forEach(bookmark => uncategorizedList.appendChild(createBookmarkItem(bookmark)));
+        uncategorizedSection.appendChild(uncategorizedList);
+    
+        bookmarksList.appendChild(uncategorizedSection);
+    
+        // Add toggle functionality for uncategorized bookmarks
+        uncategorizedHeader.addEventListener("click", () => {
+            uncategorizedList.classList.toggle("hidden");
+            const arrow = uncategorizedHeader.querySelector(".arrow");
+            arrow.textContent = uncategorizedList.classList.contains("hidden") ? "▶" : "▼";
         });
+    
+        // Create sections for each category
+        Object.keys(categories).forEach(category => {
+            const categorySection = document.createElement("div");
+            categorySection.className = "category-section";
+    
+            const categoryHeader = document.createElement("div");
+            categoryHeader.className = "category-header";
+            categoryHeader.innerHTML = `<span>${category}</span> <span class="arrow">▶</span>`;
+            categorySection.appendChild(categoryHeader);
+    
+            const categoryList = document.createElement("div");
+            categoryList.className = "bookmark-list hidden";
+            bookmarks
+                .filter(bookmark => bookmark.category === category)
+                .forEach(bookmark => categoryList.appendChild(createBookmarkItem(bookmark)));
+            categorySection.appendChild(categoryList);
+    
+            bookmarksList.appendChild(categorySection);
+    
+            // Add toggle functionality for category bookmarks
+            categoryHeader.addEventListener("click", () => {
+                categoryList.classList.toggle("hidden");
+                const arrow = categoryHeader.querySelector(".arrow");
+                arrow.textContent = categoryList.classList.contains("hidden") ? "▶" : "▼";
+            });
+        });
+    }
+    
+    function createBookmarkItem(bookmark) {
+        const bookmarkItem = document.createElement("div");
+        bookmarkItem.className = "bookmark-item";
+        bookmarkItem.dataset.id = bookmark.id;
+    
+        const typeIcon = document.createElement("img");
+        typeIcon.src = `icons/${bookmark.type}.png`;
+        typeIcon.alt = bookmark.type;
+        typeIcon.className = "bookmark-type-icon";
+    
+        const content = document.createElement("div");
+        content.className = "bookmark-content";
+    
+        const title = document.createElement("h3");
+        title.textContent = bookmark.title;
+    
+        const date = document.createElement("span");
+        date.className = "bookmark-date";
+        date.textContent = bookmark.date;
+    
+        const citation = document.createElement("p");
+        citation.className = "bookmark-citation";
+        citation.innerHTML = bookmark.citation;
+    
+        const controls = document.createElement("div");
+        controls.className = "bookmark-controls";
+    
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "bookmark-copy-btn";
+        copyBtn.textContent = "Copy";
+        copyBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+    
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = bookmark.citation;
+    
+            const tempTextarea = document.createElement("textarea");
+            tempTextarea.value = tempDiv.innerText;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextarea);
+    
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => {
+                copyBtn.textContent = "Copy";
+            }, 1500);
+        });
+    
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "bookmark-delete-btn";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            bookmarkManager.deleteBookmark(bookmark.id);
+            loadBookmarks();
+        });
+    
+        if (bookmark.url) {
+            const visitBtn = document.createElement("button");
+            visitBtn.className = "bookmark-visit-btn";
+            visitBtn.textContent = "Visit";
+            visitBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                chrome.tabs.create({ url: bookmark.url });
+            });
+            controls.appendChild(visitBtn);
+        }
+    
+        controls.appendChild(copyBtn);
+        controls.appendChild(deleteBtn);
+    
+        content.appendChild(title);
+        content.appendChild(date);
+        content.appendChild(citation);
+    
+        bookmarkItem.appendChild(typeIcon);
+        bookmarkItem.appendChild(content);
+        bookmarkItem.appendChild(controls);
+    
+        return bookmarkItem;
     }
     
     const firstCitationBtn = document.querySelector(".citation-btn");
