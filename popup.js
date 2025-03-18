@@ -195,6 +195,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedType = document.querySelector(".citation-btn.active")?.getAttribute("data-type");
         if (!selectedType) return;
 
+        const isInTextCitation = document.getElementById("inTextCitation").checked;
+
         const values = {};
         citationTemplates[selectedType].forEach(field => {
             if (["authorLast", "authorFirst", "chapterAuthorLast", "chapterAuthorFirst", "editorLast", "editorFirst"].includes(field.id)) {
@@ -217,10 +219,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 const firstInitial = values.authorFirst[index] || "";
                 return `${lastName}, ${firstInitial}`;
             });
-            values.authors = authors.join(" ");
+
+            if (isInTextCitation && authors.length > 3) {
+                values.authors = `${authors.slice(0, 3).join(", ")} et al.`;
+            } else {
+                values.authors = authors.join(" ");
+            }
         }
 
-        citationOutput.innerHTML = formatCitation(selectedType, values);
+        if (isInTextCitation) {
+            citationOutput.innerHTML = `${values.authors} (${values.year})`;
+        } else {
+            citationOutput.innerHTML = formatCitation(selectedType, values);
+        }
     });
 
     function formatCitation(type, values) {
