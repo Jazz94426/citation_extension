@@ -197,7 +197,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const values = {};
         citationTemplates[selectedType].forEach(field => {
-            values[field.id] = document.getElementById(field.id)?.value || "";
+            if (["authorLast", "authorFirst", "chapterAuthorLast", "chapterAuthorFirst", "editorLast", "editorFirst"].includes(field.id)) {
+                // Collect all values for dynamically added inputs
+                const inputs = Array.from(formFields.querySelectorAll(`.name-input[placeholder="${field.label}"]`));
+                values[field.id] = inputs.map(input => input.value).filter(value => value.trim()).join(", ");
+            } else {
+                const input = document.getElementById(field.id);
+                values[field.id] = input?.value || "";
+            }
         });
 
         citationOutput.innerHTML = formatCitation(selectedType, values);
