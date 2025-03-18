@@ -407,58 +407,65 @@ document.addEventListener("DOMContentLoaded", async () => {
         await bookmarkManager.loadBookmarks();
         const bookmarks = bookmarkManager.getBookmarks();
         const categories = bookmarkManager.getCategories();
-    
+
+        // Automatically delete empty categories
+        Object.keys(categories).forEach(category => {
+            if (categories[category].length === 0) {
+                bookmarkManager.deleteCategory(category);
+            }
+        });
+
         bookmarksList.innerHTML = "";
-    
+
         if (bookmarks.length === 0) {
             bookmarksList.innerHTML = "<p class='no-bookmarks'>No bookmarks yet. Create some citations and bookmark them!</p>";
             return;
         }
-    
+
         // Create a section for uncategorized bookmarks
         const uncategorizedSection = document.createElement("div");
         uncategorizedSection.className = "category-section";
-    
+
         const uncategorizedHeader = document.createElement("div");
         uncategorizedHeader.className = "category-header";
         uncategorizedHeader.innerHTML = `<span>Uncategorized</span> <span class="arrow">▶</span>`;
         uncategorizedSection.appendChild(uncategorizedHeader);
-    
+
         const uncategorizedList = document.createElement("div");
         uncategorizedList.className = "bookmark-list hidden";
         bookmarks
             .filter(bookmark => !bookmark.category)
             .forEach(bookmark => uncategorizedList.appendChild(createBookmarkItem(bookmark)));
         uncategorizedSection.appendChild(uncategorizedList);
-    
+
         bookmarksList.appendChild(uncategorizedSection);
-    
+
         // Add toggle functionality for uncategorized bookmarks
         uncategorizedHeader.addEventListener("click", () => {
             uncategorizedList.classList.toggle("hidden");
             const arrow = uncategorizedHeader.querySelector(".arrow");
             arrow.textContent = uncategorizedList.classList.contains("hidden") ? "▶" : "▼";
         });
-    
+
         // Create sections for each category
         Object.keys(categories).forEach(category => {
             const categorySection = document.createElement("div");
             categorySection.className = "category-section";
-    
+
             const categoryHeader = document.createElement("div");
             categoryHeader.className = "category-header";
             categoryHeader.innerHTML = `<span>${category}</span> <span class="arrow">▶</span>`;
             categorySection.appendChild(categoryHeader);
-    
+
             const categoryList = document.createElement("div");
             categoryList.className = "bookmark-list hidden";
             bookmarks
                 .filter(bookmark => bookmark.category === category)
                 .forEach(bookmark => categoryList.appendChild(createBookmarkItem(bookmark)));
             categorySection.appendChild(categoryList);
-    
+
             bookmarksList.appendChild(categorySection);
-    
+
             // Add toggle functionality for category bookmarks
             categoryHeader.addEventListener("click", () => {
                 categoryList.classList.toggle("hidden");

@@ -64,6 +64,28 @@ class BookmarkManager {
     }
   }
 
+  deleteCategory(category) {
+    if (this.categories[category]) {
+      // Delete all bookmarks in the category
+      const bookmarkIds = this.categories[category];
+      this.bookmarks = this.bookmarks.filter(bookmark => !bookmarkIds.includes(bookmark.id));
+
+      // Remove the category
+      delete this.categories[category];
+      this.saveBookmarks(); // Save changes to storage
+    }
+  }
+
+  // Automatically clean up empty categories
+  cleanEmptyCategories() {
+    Object.keys(this.categories).forEach(category => {
+      if (this.categories[category].length === 0) {
+        delete this.categories[category];
+      }
+    });
+    this.saveBookmarks();
+  }
+
   getCategories() {
     return this.categories;
   }
