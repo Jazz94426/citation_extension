@@ -92,53 +92,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let selectedThesisType = "doctoral"; 
 
-    document.querySelectorAll(".citation-btn").forEach(button => {
-        button.addEventListener("click", () => {
-            document.querySelectorAll(".citation-btn").forEach(btn => btn.classList.remove("active"));
-            button.classList.add("active");
-            const type = button.getAttribute("data-type");
+    const citationButtonsContainer = document.querySelector(".styles");
+    const thesisTypeSelector = document.getElementById("thesisTypeSelector");
 
-            // Hide home page informational text and show citation page content
-            document.getElementById("homePageInfo").classList.add("hidden");
-            document.getElementById("citationPageContent").classList.remove("hidden");
+    citationButtonsContainer.addEventListener("click", (event) => {
+        const button = event.target.closest(".citation-btn");
+        if (!button) return;
 
-            // Ensure thesis type selector visibility is toggled only for "thesis"
-            const thesisTypeSelector = document.getElementById("thesisTypeSelector");
-            if (type === "thesis") {
-                thesisTypeSelector.classList.remove("hidden");
-            } else {
-                thesisTypeSelector.classList.add("hidden");
+        document.querySelectorAll(".citation-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        const type = button.getAttribute("data-type");
+
+        // Hide home page informational text and show citation page content
+        document.getElementById("homePageInfo").classList.add("hidden");
+        document.getElementById("citationPageContent").classList.remove("hidden");
+
+        // Ensure thesis type selector visibility is toggled only for "thesis"
+        if (type === "thesis") {
+            thesisTypeSelector.classList.remove("hidden");
+            if (!formFields.contains(thesisTypeSelector)) {
+                formFields.appendChild(thesisTypeSelector);
             }
+        } else {
+            thesisTypeSelector.classList.add("hidden");
+            if (formFields.contains(thesisTypeSelector)) {
+                formFields.removeChild(thesisTypeSelector);
+            }
+        }
 
-            // Show form fields and output container
-            document.getElementById("citationForm").classList.remove("hidden");
-            document.querySelector(".citation-output-container").classList.remove("hidden");
+        // Show form fields and output container
+        document.getElementById("citationForm").classList.remove("hidden");
+        document.querySelector(".citation-output-container").classList.remove("hidden");
 
-            // Render form fields for the selected citation type
-            renderFormFields(type);
-        });
+        // Render form fields for the selected citation type
+        renderFormFields(type);
     });
 
+    thesisTypeSelector.addEventListener("click", (event) => {
+        const button = event.target.closest(".thesis-type-btn");
+        if (!button) return;
 
-    document.querySelectorAll(".thesis-type-btn").forEach(button => {
-        button.addEventListener("click", () => {
-            document.querySelectorAll(".thesis-type-btn").forEach(btn => btn.classList.remove("active"));
-            button.classList.add("active");
-            
-            const type = button.getAttribute("data-type");
-            selectedThesisType = type;
-            
-            const otherInput = document.getElementById("otherThesisType");
-            const universityInput = document.getElementById("university");
-            
-            if (type === "other") {
-                otherInput.classList.remove("hidden");
-                if (universityInput) universityInput.classList.add("hidden");
-            } else {
-                otherInput.classList.add("hidden");
-                if (universityInput) universityInput.classList.remove("hidden");
-            }
-        });
+        document.querySelectorAll(".thesis-type-btn").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        const type = button.getAttribute("data-type");
+        selectedThesisType = type;
+
+        const otherInput = document.getElementById("otherThesisType");
+        const universityInput = document.getElementById("university");
+
+        if (type === "other") {
+            otherInput.classList.remove("hidden");
+            if (universityInput) universityInput.classList.add("hidden");
+        } else {
+            otherInput.classList.add("hidden");
+            if (universityInput) universityInput.classList.remove("hidden");
+        }
     });
 
     function renderFormFields(type) {
@@ -188,15 +197,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 formFields.appendChild(input);
             }
         });
-
-        if (type === "thesis") {
-            const thesisTypeSelector = document.getElementById("thesisTypeSelector");
-            formFields.appendChild(thesisTypeSelector);
-            thesisTypeSelector.classList.remove("hidden");
-        } else {
-            const thesisTypeSelector = document.getElementById("thesisTypeSelector");
-            thesisTypeSelector.classList.add("hidden");
-        }
     }
 
     generateButton.addEventListener("click", () => {
