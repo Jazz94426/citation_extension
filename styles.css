@@ -441,3 +441,14 @@ hr {
     color: #555;
     margin-top: 10px;
 }
+
+.info-text {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.hidden {
+    display: none;
+}

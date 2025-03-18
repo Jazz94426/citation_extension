@@ -14,7 +14,7 @@
         </div>
         
         <div id="generatorPanel" class="panel">
-            <h2>Select Citation Type</h2>
+            <h2>Citation Generator</h2>
             <div class="styles">
                 <button class="citation-btn" data-type="book"><img src="icons/book.png" alt="Book"> Book</button>
                 <button class="citation-btn" data-type="chapter"><img src="icons/chapter.png" alt="Chapter"> Chapter</button>
@@ -24,31 +24,34 @@
                 <button id="connectApiKeyButton" class="citation-btn green-btn"><img src="icons/key.png" alt="API Key"> API Key</button>
             </div>
             <hr>
+            <p id="homePageInfo" class="info-text">This extension helps you generate citations in the Supbiotech style. Select a citation type to get started.</p>
             
-            <div id="thesisTypeSelector" class="thesis-type-selector hidden">
-                <button class="thesis-type-btn" data-type="doctoral">Doctoral</button>
-                <button class="thesis-type-btn" data-type="masters">Master</button>
-                <button class="thesis-type-btn" data-type="other">Other</button>
-                <input type="text" id="otherThesisType" class="hidden" placeholder="Enter thesis type">
-            </div>
-            <form id="citationForm">
-                <div id="formFields"></div>
-
-                <div class="checkbox-row">
-                    <label>
-                        <input type="checkbox" id="inTextCitation">
-                        In-text citation
-                    </label>
+            <div id="citationPageContent" class="hidden">
+                <div id="thesisTypeSelector" class="thesis-type-selector hidden">
+                    <button class="thesis-type-btn" data-type="doctoral">Doctoral</button>
+                    <button class="thesis-type-btn" data-type="masters">Master</button>
+                    <button class="thesis-type-btn" data-type="other">Other</button>
+                    <input type="text" id="otherThesisType" class="hidden" placeholder="Enter thesis type">
                 </div>
+                <form id="citationForm" class="hidden">
+                    <div id="formFields"></div>
 
-                <button type="button" id="generateCitation">Generate Citation</button>
-            </form>
-            
-            <div class="citation-output-container">
-                <div id="citationOutput" contenteditable="false" class="citation-text-area"></div>
-                <div class="button-row">
-                    <button id="copyButton">Copy</button>
-                    <button id="bookmarkButton">Bookmark</button>
+                    <div class="checkbox-row">
+                        <label>
+                            <input type="checkbox" id="inTextCitation">
+                            In-text citation
+                        </label>
+                    </div>
+
+                    <button type="button" id="generateCitation">Generate Citation</button>
+                </form>
+                
+                <div class="citation-output-container hidden">
+                    <div id="citationOutput" contenteditable="false" class="citation-text-area"></div>
+                    <div class="button-row">
+                        <button id="copyButton">Copy</button>
+                        <button id="bookmarkButton">Bookmark</button>
+                    </div>
                 </div>
             </div>
         </div>

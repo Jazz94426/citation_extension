@@ -98,6 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.add("active");
             const type = button.getAttribute("data-type");
 
+            // Hide home page informational text and show citation page content
+            document.getElementById("homePageInfo").classList.add("hidden");
+            document.getElementById("citationPageContent").classList.remove("hidden");
+
             // Ensure thesis type selector visibility is toggled only for "thesis"
             const thesisTypeSelector = document.getElementById("thesisTypeSelector");
             if (type === "thesis") {
@@ -105,6 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 thesisTypeSelector.classList.add("hidden");
             }
+
+            // Show form fields and output container
+            document.getElementById("citationForm").classList.remove("hidden");
+            document.querySelector(".citation-output-container").classList.remove("hidden");
 
             // Render form fields for the selected citation type
             renderFormFields(type);
@@ -442,10 +450,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     const firstCitationBtn = document.querySelector(".citation-btn");
-    if (firstCitationBtn) {
-        firstCitationBtn.classList.add("active");
-        renderFormFields(firstCitationBtn.getAttribute("data-type"));
-    }
+    // Remove the logic that sets the first citation button as active
+    // if (firstCitationBtn) {
+    //     firstCitationBtn.classList.add("active");
+    //     renderFormFields(firstCitationBtn.getAttribute("data-type"));
+    // }
 
     const connectApiKeyButton = document.getElementById("connectApiKeyButton");
     const apiKeyModal = document.getElementById("apiKeyModal");
