@@ -200,22 +200,35 @@ document.addEventListener("DOMContentLoaded", () => {
             if (["authorLast", "authorFirst", "chapterAuthorLast", "chapterAuthorFirst", "editorLast", "editorFirst"].includes(field.id)) {
                 // Collect all values for dynamically added inputs
                 const inputs = Array.from(formFields.querySelectorAll(`.name-input[placeholder="${field.label}"]`));
-                values[field.id] = inputs.map(input => input.value).filter(value => value.trim()).join(", ");
+                if (field.id.includes("Last")) {
+                    values[field.id] = inputs.map(input => input.value.trim());
+                } else if (field.id.includes("First")) {
+                    values[field.id] = inputs.map(input => input.value.trim().charAt(0).toUpperCase() + ".");
+                }
             } else {
                 const input = document.getElementById(field.id);
                 values[field.id] = input?.value || "";
             }
         });
 
+        // Combine last names and first initials into the correct format
+        if (values.authorLast && values.authorFirst) {
+            const authors = values.authorLast.map((lastName, index) => {
+                const firstInitial = values.authorFirst[index] || "";
+                return `${lastName}, ${firstInitial}`;
+            });
+            values.authors = authors.join(" ");
+        }
+
         citationOutput.innerHTML = formatCitation(selectedType, values);
     });
 
     function formatCitation(type, values) {
         const formats = {
-            book: `${values.authorLast}, ${values.authorFirst}. (${values.year}). <i>${values.title} (${values.edition})</i>. ${values.publisher}.`,
-            chapter: `${values.chapterAuthorLast}, ${values.chapterAuthorFirst}. (${values.year}). ${values.chapterTitle}. In ${values.editorLast}, ${values.editorFirst} (ed.), <i>${values.bookTitle} (${values.edition})</i> (pp.: ${values.pages}). ${values.publisher}.`,
-            thesis: `${values.authorLast}, ${values.authorFirst}. (${values.year}). <i>${values.title}</i>. (${values.reference}) [${getThesisTypeText()}, ${values.university}].`,
-            journal: `${values.authorLast}, ${values.authorFirst}. (${values.year}). ${values.title}. <i>${values.journalTitle}</i>, ${values.volume}(${values.issue}), ${values.pages}.`,
+            book: `${values.authors} (${values.year}). <i>${values.title} (${values.edition})</i>. ${values.publisher}.`,
+            chapter: `${values.authors} (${values.year}). ${values.chapterTitle}. In ${values.editorLast}, ${values.editorFirst} (ed.), <i>${values.bookTitle} (${values.edition})</i> (pp.: ${values.pages}). ${values.publisher}.`,
+            thesis: `${values.authors} (${values.year}). <i>${values.title}</i>. (${values.reference}) [${getThesisTypeText()}, ${values.university}].`,
+            journal: `${values.authors} (${values.year}). ${values.title}. <i>${values.journalTitle}</i>, ${values.volume}(${values.issue}), ${values.pages}.`,
             webpage: `${values.website}. <i>${values.title}</i>. ${values.url}. (Accessed on ${values.accessDate}).`
         };
         return formats[type] || "";
