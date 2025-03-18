@@ -120,6 +120,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // Hide "In-text citation" checkbox for "webpage" type
+        const inTextCheckboxRow = document.querySelector(".checkbox-row");
+        if (type === "webpage") {
+            inTextCheckboxRow.classList.add("hidden");
+        } else {
+            inTextCheckboxRow.classList.remove("hidden");
+        }
+
         // Show form fields and output container
         document.getElementById("citationForm").classList.remove("hidden");
         document.querySelector(".citation-output-container").classList.remove("hidden");
