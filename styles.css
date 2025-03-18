@@ -494,3 +494,25 @@ hr {
 .hidden {
     display: none;
 }
+
+.category-container {
+    margin-top: 10px;
+    margin-bottom: 20px; /* Add space below the category box */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#categorySelect {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#newCategoryInput {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}

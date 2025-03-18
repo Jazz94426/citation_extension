@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const formFields = document.getElementById("formFields");
     const citationOutput = document.getElementById("citationOutput");
     const generateButton = document.getElementById("generateCitation");
@@ -335,17 +335,59 @@ document.addEventListener("DOMContentLoaded", () => {
         bookmarkTitle.value = defaultTitle || `Citation ${Date.now()}`;
     });
     
+    const categorySelect = document.createElement("select");
+    categorySelect.id = "categorySelect";
+    categorySelect.innerHTML = `<option value="">No Category</option>`;
+
+    const newCategoryInput = document.createElement("input");
+    newCategoryInput.type = "text";
+    newCategoryInput.id = "newCategoryInput";
+    newCategoryInput.placeholder = "New Category";
+
+    const categoryContainer = document.createElement("div");
+    categoryContainer.className = "category-container";
+    categoryContainer.appendChild(categorySelect);
+    categoryContainer.appendChild(newCategoryInput);
+
+    const modalContent = bookmarkModal.querySelector(".modal-content");
+    modalContent.insertBefore(categoryContainer, modalContent.querySelector(".button-row"));
+
+    await bookmarkManager.loadBookmarks();
+
+    function populateCategorySelect() {
+        categorySelect.innerHTML = `<option value="">No Category</option>`;
+        const categories = bookmarkManager.getCategories();
+        Object.keys(categories).forEach(category => {
+            const option = document.createElement("option");
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    populateCategorySelect();
+
     saveBookmarkBtn.addEventListener("click", () => {
         const citation = citationOutput.innerHTML;
         const selectedType = document.querySelector(".citation-btn.active")?.getAttribute("data-type");
         const title = bookmarkTitle.value.trim() || `Citation ${Date.now()}`;
         const url = savePageUrl.checked ? bookmarkUrl.value : null;
-        
-        bookmarkManager.addBookmark(citation, selectedType, title, url);
-        
+
+        let category = categorySelect.value;
+        if (!category && newCategoryInput.value.trim()) {
+            category = newCategoryInput.value.trim();
+            bookmarkManager.addCategory(category);
+        } else if (!category && !newCategoryInput.value.trim()) {
+            category = null; // No category if nothing is selected or written
+        }
+
+        bookmarkManager.addBookmark(citation, selectedType, title, url, category);
+
         bookmarkTitle.value = "";
         bookmarkUrl.value = "";
+        newCategoryInput.value = "";
         bookmarkModal.classList.add("hidden");
+        populateCategorySelect();
     });
     
     cancelBookmarkBtn.addEventListener("click", () => {
