@@ -526,6 +526,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             loadBookmarks();
         });
     
+        const editBtn = document.createElement("button");
+        editBtn.className = "bookmark-edit-btn";
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+    
+            // Save the bookmark data to storage and redirect to the edit page
+            chrome.storage.sync.set({ editingBookmark: bookmark }, () => {
+                window.location.href = "editBookmark.html";
+            });
+        });
+    
         if (bookmark.url) {
             const visitBtn = document.createElement("button");
             visitBtn.className = "bookmark-visit-btn";
@@ -539,6 +551,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     
         controls.appendChild(copyBtn);
         controls.appendChild(deleteBtn);
+        controls.appendChild(editBtn);
     
         content.appendChild(title);
         content.appendChild(date);

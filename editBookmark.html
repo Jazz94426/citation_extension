@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Bookmark</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Edit Bookmark</h2>
+        <div class="form-container">
+            <input type="text" id="editBookmarkTitle" placeholder="Enter a title for this citation">
+            <div class="checkbox-row">
+                <label>
+                    <input type="checkbox" id="editSavePageUrl">
+                    Include current page URL
+                </label>
+            </div>
+            <div id="editUrlInputContainer" class="url-input-container">
+                <input type="text" id="editBookmarkUrl" placeholder="URL">
+            </div>
+            <div class="category-container">
+                <select id="editCategorySelect">
+                    <option value="">No Category</option>
+                </select>
+                <input type="text" id="editNewCategoryInput" placeholder="New Category">
+            </div>
+            <div class="button-row">
+                <button id="cancelEditBookmark">Cancel</button>
+                <button id="saveEditBookmark">Save</button>
+            </div>
+        </div>
+    </div>
+    <script src="editBookmark.js"></script>
+</body>
+</html>
