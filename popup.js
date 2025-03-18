@@ -220,7 +220,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 return `${lastName}, ${firstInitial}`;
             });
 
-            if (isInTextCitation && authors.length > 3) {
+            if (authors.length === 2) {
+                values.authors = `${authors[0]} & ${authors[1]}`;
+            } else if (isInTextCitation && authors.length > 3) {
                 values.authors = `${authors.slice(0, 3).join(", ")} et al.`;
             } else {
                 values.authors = authors.join(" ");
