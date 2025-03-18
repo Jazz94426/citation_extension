@@ -635,14 +635,82 @@ document.addEventListener("DOMContentLoaded", async () => {
     const smallGreenButton = document.getElementById("smallGreenButton");
 
     smallGreenButton.addEventListener("click", () => {
-        alert("Small green button clicked!");
+        console.log("Small green button clicked!");
         // Add your desired functionality here
     });
 
     const aiButton = document.getElementById("aiButton");
 
-    aiButton.addEventListener("click", () => {
-        alert("AI Button clicked!");
-        // Add your desired functionality here
+    aiButton.addEventListener("click", async () => {
+        const selectedType = document.querySelector(".citation-btn.active")?.getAttribute("data-type");
+        if (!selectedType) {
+            console.log("Please select a citation type first.");
+            return;
+        }
+
+        chrome.storage.sync.get("openAiApiKey", async (result) => {
+            const apiKey = result.openAiApiKey;
+            if (!apiKey) {
+                console.log("Please provide a valid OpenAI API key in the API Key section.");
+                return;
+            }
+
+            // Extract metadata from the current webpage
+            chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+                chrome.tabs.sendMessage(tabs[0].id, { action: "getMetadata" }, async (metadata) => {
+                    if (!metadata) {
+                        console.log("Failed to extract metadata from the webpage.");
+                        return;
+                    }
+
+                    try {
+                        // Prepare the OpenAI API request
+                        const prompt = `
+                            Extract the following information from the webpage metadata and provide it in JSON format:
+                            Citation Type: ${selectedType}
+                            Metadata: ${JSON.stringify(metadata)}
+                            Fields: ${JSON.stringify(citationTemplates[selectedType].map(field => field.label))}
+                        `;
+
+                        const response = await fetch("https://api.openai.com/v1/completions", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${apiKey}`,
+                            },
+                            body: JSON.stringify({
+                                model: "gpt-4o-mini-2024-07-18", // Updated model
+                                prompt: prompt,
+                                max_tokens: 500,
+                                temperature: 0.7,
+                            }),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch data from OpenAI API.");
+                        }
+
+                        const data = await response.json();
+                        const extractedDataString = data.choices[0].text.trim();
+
+                        // Parse the string response into an object
+                        const extractedData = JSON.parse(extractedDataString);
+
+                        // Populate the form fields with the extracted data
+                        citationTemplates[selectedType].forEach((field) => {
+                            const input = document.getElementById(field.id);
+                            if (input && extractedData[field.label]) {
+                                input.value = extractedData[field.label];
+                            }
+                        });
+
+                        console.log("Fields populated successfully using AI.");
+                    } catch (error) {
+                        console.error("Error using OpenAI API:", error);
+                        console.log("Failed to fetch data from OpenAI API. Please try again.");
+                    }
+                });
+            });
+        });
     });
 });
