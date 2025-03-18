@@ -509,4 +509,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         });
     });
+
+    const smallGreenButton = document.getElementById("smallGreenButton");
+
+    smallGreenButton.addEventListener("click", () => {
+        alert("Small green button clicked!");
+        // Add your desired functionality here
+    });
+
+    const aiButton = document.getElementById("aiButton");
+
+    aiButton.addEventListener("click", () => {
+        alert("AI Button clicked!");
+        // Add your desired functionality here
+    });
 });

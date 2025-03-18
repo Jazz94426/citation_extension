@@ -110,9 +110,51 @@ input[type="text"] {
 
 #generateCitation {
     margin-bottom: 15px;
-    width: 100%;
+    width: calc(100% - 50px); /* Reduced width to make space for the AI button */
+    height: 40px; /* Ensure consistent height */
 }
 
+.ai-btn {
+    width: 40px;
+    height: 40px; /* Match the height of the Generate Citation button */
+    background-color: #4caf50;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.ai-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.ai-btn:hover {
+    background-color: #388e3c;
+}
+
+.small-green-btn {
+    width: 40px;
+    height: 40px;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.small-green-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.small-green-btn:hover {
+    background-color: #388e3c;
+}
 
 .citation-output-container {
     margin-bottom: 15px;
